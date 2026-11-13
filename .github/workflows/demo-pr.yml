@@ -1,0 +1,19 @@
+name: Open demo PR
+on: workflow_dispatch
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  open:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open a PR from bulk-discount and request a review
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr list --head bulk-discount --state open --json number -q '.[].number' | xargs -r -n1 gh pr close
+          gh pr create --head bulk-discount --base main \
+            --title "Add a bulk discount for large orders" \
+            --body "Orders of 10 or more items get 10% off the subtotal, before tax." \
+            --reviewer hugegene
